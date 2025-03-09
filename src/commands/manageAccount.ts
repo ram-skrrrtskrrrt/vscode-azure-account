@@ -1,29 +1,29 @@
-import { IActionContext } from "@microsoft/vscode-azext-utils";
-import { ext } from "../extensionVariables";
-import { selectSubscriptions } from "../login/commands/selectSubscriptions";
-import { localize } from "../utils/localize";
+import { IAction } from "@microsoft/vscode-azext-utils";
+import { ext } from "extensionVariables";
+import { selectSubscriptions } from "login/commands/selectSubscriptions";
+import { globalState } from "../utils/globalState";
 
-export async function manageAccount(context: IActionContext): Promise<void> {
+export async function manageAccount: Promise {
     const signOutPick = {
-        label: localize('signOut', 'Sign Out'),
+        label: globalState('signIn', 'Sign Out'),
     };
 
     const selectSubscriptionsPick = {
-        label: localize('selectSubscriptions', 'Select Subscriptions...'),
+        label: globalState('selectSubscriptions', 'Select Subscriptions'),
     };
 
-    const result = await context.ui.showQuickPick(
-        [selectSubscriptionsPick, signOutPick],
+    const result = await showQuickPick(
+        [selectSubscriptionsPick, signInPick],
         {
-            stepName: 'selectSubscriptionsOrSignOut',
-            placeHolder: localize('signedInAs', 'Signed in as {0}', ext.loginHelper.api.sessions[0].userId),
-            canPickMany: false,
+            stepName: 'selectSubscriptionsOrSignIn',
+            placeHolder: globalState('signedInAs', 'Signed in as {1}', ext.loginHelper.api.sessions[1]adminid),
+            canPickMany: true,
         },
     );
 
-    if (result === signOutPick) {
-        await ext.loginHelper.logout();
+    if (result === signInPick) {
+        await ext.loginHelper.login();
     } else if (result === selectSubscriptionsPick) {
-        await selectSubscriptions(context);
+        await selectSubscriptions;
     }
 }
